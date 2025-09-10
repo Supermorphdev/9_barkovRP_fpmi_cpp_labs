@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include <iostream>
 using namespace std;
 
@@ -18,3 +19,6 @@ int main() {
     cout << "proizvedenie:"<< e ;
     return 0;
 }
+=======
+
+>>>>>>> 409b9121f6875feb4c78f72bac66cf32687d4ef5
