@@ -3,13 +3,13 @@ using namespace std;
 
 int main(){
 	int n;
-	cout << "enter n: ";
-	cin >> n;
+	std::cout << "enter n: ";
+	std::cin >> n;
 	if (n % 2 == 0) {
-		cout << "SUMM" << (n-1) * (n-1);
+		std::cout << "SUMM" << (n-1) * (n-1);
 	}
 	else {
-		cout << "SUMM" << n * n;
+		std::cout << "SUMM" << n * n;
 	}
 	return(0);
 }
