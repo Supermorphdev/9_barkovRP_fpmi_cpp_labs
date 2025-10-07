@@ -1,7 +1,9 @@
 #include <iostream>
 #include <limits>
 #include <cmath>
-void TryRead(int& number) {
+#include <random>
+template<typename T>
+void TryRead(T& number) {
     while (true) {
         if (!(std::cin >> number)) {
             std::cout << "Fail on reading the number. Try again: ";
@@ -15,18 +17,41 @@ void TryRead(int& number) {
 }
 
 
-
 int main() {
-    int n;
-    std::cout << "enter amount of array: ";
-    std::cin >> n;
-
+    int n{};
+    std::cout << "enter number of elements: ";
+    TryRead(n);
     double* massive = new double[n];
 
-    std::cout << "enter elements:\n";
-    for (int i = 0; i < n; i++) {
-        std::cin >> massive[i];
+    double choice;
+    std::cout << "Choose how you want to enter the array(1-manual enter ,2-random enter): ";
+    TryRead(choice);
+
+    if (choice == 1) {
+        std::cout << "Enter array elements:\n";
+        for (int i = 0; i < n; i++) {
+            TryRead(massive[i]);
+        }
     }
+    else if (choice == 2) {
+        double a, b;
+        std::cout << "Enter the borders of array [a, b]:\n";
+        std::cout << "a = ";
+        TryRead(a);
+        std::cout << "b = ";
+        TryRead(b);
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<double> dist(a, b);
+
+        std::cout << "Generated array: ";
+        for (int i = 0; i < n; i++) {
+            massive[i] = dist(gen);
+            std::cout << massive[i] << std::endl;
+        }
+    }
+    ////////////////////////////////////////////////////////
 
     int MinIndex = 0;
     for (int i = 1; i < n; i++) {
@@ -36,7 +61,8 @@ int main() {
     }
     std::cout << "number of min elemet: " << MinIndex + 1 << std::endl;
     ////////////////////////////////////////////////////////
-    int FirstNeg, LastNeg = -1;
+    int FirstNeg = -1;
+    int LastNeg = -1;
     for (int i = 0; i < n; i++) {
         if (massive[i] < 0) {
             FirstNeg = i;
@@ -58,12 +84,12 @@ int main() {
         std::cout << "Sum of elements between first and last negative elements of array: " << sum << std::endl;
     }
     else {
-        std::cout << "There are no elements between first and last neg or there is no neg";
+        std::cout << "There are no elements between first and last neg or there is no neg" << std::endl;
     }
     ////////////////////////////////////////////////////////
     double x;
     std::cout << "enter x: ";
-    std::cin >> x;
+    TryRead(x);
 
     int count = 0;
     for (int i = 0; i < n; i++) {
@@ -73,7 +99,7 @@ int main() {
     }
     int i = 0, j = count;
     while (i < count && j < n) {
-        if (std::abs(massive[i]) > x && std::abs(massive[i]) <= x) {
+        if (std::abs(massive[i]) > x && std::abs(massive[j]) <= x) {
             std::swap(massive[i], massive[j]);
             j++;
             i++;
