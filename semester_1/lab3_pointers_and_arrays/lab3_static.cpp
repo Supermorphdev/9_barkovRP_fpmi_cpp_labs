@@ -6,7 +6,7 @@
 const int MAX_SIZE = 100000;
 
 template<typename T>
-void TryRead(T& number) {
+void Read(T& number) {
     while (true) {
         if (!(std::cin >> number)) {
             std::cout << "Fail on reading the number. Try again: ";
@@ -19,122 +19,163 @@ void TryRead(T& number) {
     }
 }
 
-int main() {
-    int n{};
-    std::cout << "enter number of elements: ";
-    TryRead(n);
-    
-    if (n > MAX_SIZE) {
-        std::cout << "Error: Array size exceeds maximum allowed size of " << MAX_SIZE << std::endl;
-        std::cout << "Please use a smaller array size." << std::endl;
-        return 1;
+static void CheckSize(const int n) {
+    if (n > MAX_SIZE || n <= 0) {
+        std::cout << "Array size is invalid. Try again next time";
+        exit(1);
     }
-    if (n <= 0) {
-        std::cout << "Error: Invalid array size" << std::endl;
-        return 1;
+}
+
+static void FillMassiveManual(double* massive, const int n) {
+    for (int i = 0; i < n; ++i) {
+        std::cout << "Enter element " << i + 1 << ": ";
+        Read(massive[i]);
     }
-    
-    double massive[MAX_SIZE]; 
+}
 
-    double choice;
-    std::cout << "Choose how you want to enter the array(1-manual enter ,2-random enter): ";
-    TryRead(choice);
-
-    if (choice == 1) {
-        std::cout << "Enter array elements:\n";
-        for (int i = 0; i < n; i++) {
-            TryRead(massive[i]);
-        }
+static void CheckRandomBounds(double& a, double& b) {
+    std::cout << "Enter interval boundaries [a, b]: ";
+    Read(a);
+    Read(b);
+    if (a > b) {
+        std::swap(a, b);
     }
-    else if (choice == 2) {
-        double a, b;
-        std::cout << "Enter the borders of array [a, b]:\n";
-        std::cout << "a = ";
-        TryRead(a);
-        std::cout << "b = ";
-        TryRead(b);
+}
 
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_real_distribution<double> dist(a, b);
+void fillArrayRandom(double* matrix, const int n, const double a, const double b) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dist(a, b);
 
-        std::cout << "Generated array: ";
-        for (int i = 0; i < n; i++) {
-            massive[i] = dist(gen);
-            std::cout << massive[i] << " ";
-        }
-        std::cout << std::endl;
-    }
-
-    // Поиск минимального элемента
-    int MinIndex = 0;
-    for (int i = 1; i < n; i++) {
-        if (massive[i] <= massive[MinIndex]) {
-            MinIndex = i;
-        }
-    }
-    std::cout << "number of min element: " << MinIndex + 1 << std::endl;
-
-    ////////////////////////////////////////////
-    int FirstNeg = -1;
-    int LastNeg = -1;
     for (int i = 0; i < n; i++) {
-        if (massive[i] < 0) {
-            FirstNeg = i;
-            break;
-        }
+        matrix[i] = dist(gen);
     }
-    for (int i = n - 1; i >= 0; i--) {
-        if (massive[i] < 0) {
-            LastNeg = i;
-            break;
-        }
-    }
+}
 
-    double sum = 0;
-    if (FirstNeg != -1 && LastNeg != -1 && FirstNeg < LastNeg) {
-        for (int i = FirstNeg + 1; i < LastNeg; i++) {
-            sum += massive[i];
-        }
-        std::cout << "Sum of elements between first and last negative elements of array: " << sum << std::endl;
-    }
-    else {
-        std::cout << "There are no elements between first and last neg or there is no neg" << std::endl;
-    }
-
-    //////////////////////////////////////////////////
-    double x;
-    std::cout << "enter x: ";
-    TryRead(x);
-
-    int count = 0;
-    for (int i = 0; i < n; i++) {
-        if (std::abs(massive[i]) <= x) {
-            count++;
-        }
-    }
-    
-    int i = 0, j = count;
-    while (i < count && j < n) {
-        if (std::abs(massive[i]) > x && std::abs(massive[j]) <= x) {
-            std::swap(massive[i], massive[j]);
-            j++;
-            i++;
-        }
-        else if (std::abs(massive[i]) <= x) {
-            i++;
+int option_receive() {
+    std::cout << "\nChoose option of filling array: manual(1), randomfill(2): ";
+    int option;
+    while (true) {
+        if (!(std::cin >> option) || (option != 1 && option != 2)) {
+            std::cout << "There is no such option. Try again\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
         else {
-            j++;
+            break;
         }
     }
-    
+    return option;
+}
 
-    std::cout << "Edited array: ";
-    for (int i = 0; i < n; i++) {
+void array_print(const double* massive, const int n) {
+    for (int i = 0; i < n; ++i) {
         std::cout << massive[i] << " ";
     }
     std::cout << std::endl;
-    
+}
+
+int countDistinctElements(const double* massive, const int n) {
+    int distinctCount = 0;
+
+    for (int i = 0; i < n; ++i) {
+        bool isUnique = true;
+
+        for (int j = 0; j < i; ++j) {
+            if (std::fabs(massive[i] - massive[j]) < 1e-9) {
+                isUnique = false;
+                break;
+            }
+        }
+
+        if (isUnique) {
+            distinctCount++;
+        }
+    }
+
+    return distinctCount;
+}
+
+double productBeforeMinAbsolute(const double* massive, const int n) {
+    if (n <= 0) return 1.0;
+
+    int minIndex = 0;
+    for (int i = 1; i < n; ++i) {
+        if (std::fabs(massive[i]) < std::fabs(massive[minIndex])) {
+            minIndex = i;
+        }
+    }
+
+    if (minIndex == 0) {
+        return 1.0;
+    }
+
+    double product = 1.0;
+    for (int i = 0; i < minIndex; ++i) {
+        product *= massive[i];
+    }
+
+    return product;
+}
+
+void rearrangeArray(double* massive, const int n) {
+    int insertPos = 0;
+
+    for (int i = 0; i < n; ++i) {
+        if (massive[i] < 0) {
+            double temp = massive[i];
+            for (int j = i; j > insertPos; --j) {
+                massive[j] = massive[j - 1];
+            }
+            massive[insertPos] = temp;
+            insertPos++;
+        }
+    }
+
+    for (int i = insertPos; i < n; ++i) {
+        if (std::fabs(massive[i]) < 1e-9) {
+            double temp = massive[i];
+            for (int j = i; j > insertPos; --j) {
+                massive[j] = massive[j - 1];
+            }
+            massive[insertPos] = temp;
+            insertPos++;
+        }
+    }
+}
+
+int main() {
+    int n;
+    std::cout << "Enter array size: ";
+    Read(n);
+    CheckSize(n);
+
+    double* massive = new double[n];
+
+    int option = option_receive();
+    if (option == 1) {
+        FillMassiveManual(massive, n);
+    }
+    else {
+        double a, b;
+        CheckRandomBounds(a, b);
+        fillArrayRandom(massive, n, a, b);
+    }
+
+    std::cout << "Original array: ";
+    array_print(massive, n);
+
+    int distinctCount = countDistinctElements(massive, n);
+    std::cout << "Number of distinct elements: " << distinctCount << std::endl;
+
+    double product = productBeforeMinAbsolute(massive, n);
+    std::cout << "Product of elements before minimum absolute: " << product << std::endl;
+
+    rearrangeArray(massive, n);
+    std::cout << "Rearranged array (negative, zero, positive): ";
+    array_print(massive, n);
+
+    delete[] massive;
+
     return 0;
 }
