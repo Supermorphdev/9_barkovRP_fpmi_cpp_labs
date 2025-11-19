@@ -120,25 +120,15 @@ void fillMatrix(int** matrix, int rows, int cols) {
 }
 
 void printMatrix(int** matrix, int rows, int cols) {
-    if (matrix == nullptr || rows <= 0 || cols <= 0) {
-        throw "Calculation error: Cannot print invalid matrix";
-    }
-
     int maxWidth = 0;
+
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-            int num = matrix[i][j];
-            int width = 1;
-            if (num < 0) {
-                width++;
-                num = -num;
-            }
-            while (num >= 10) {
-                width++;
-                num /= 10;
-            }
-            if (width > maxWidth) {
-                maxWidth = width;
+            int value = matrix[i][j];
+            int digits = (value == 0) ? 1 : static_cast<int>(std::log10(std::abs(value))) + 1;
+            if (value < 0) digits++;
+            if (digits > maxWidth) {
+                maxWidth = digits;
             }
         }
     }
@@ -151,22 +141,22 @@ void printMatrix(int** matrix, int rows, int cols) {
     }
 }
 
-int sumColumnsWithZero(int** matrix, int rows, int cols) {
+void sumColumnsWithZero(int** matrix, int rows, int cols) {
     if (matrix == nullptr || rows <= 0 || cols <= 0) {
         throw "Calculation error: Invalid matrix for column sum calculation";
     }
 
-    int totalSum = 0;
-    for (int j = 0; j < cols; j++) {
-        bool hasZero = false;
-        for (int i = 0; i < rows; i++) {
+    for (int i = 0; i < cols; i++) {
+        bool zeroPresence = false;
+        double totalSum = 0;
+        for (int j = 0; j < rows; j++) {
             if (matrix[i][j] == 0) {
-                hasZero = true;
+                zeroPresence = true;
                 break;
             }
         }
-        if (hasZero) {
-            for (int i = 0; i < rows; i++) {
+        if (zeroPresence) {
+            for (int j = 0; j < rows; j++) {
                 if ((matrix[i][j] > 0 && totalSum > std::numeric_limits<int>::max() - matrix[i][j]) ||
                     (matrix[i][j] < 0 && totalSum < std::numeric_limits<int>::min() - matrix[i][j])) {
                     throw "Calculation error: Integer overflow in column sum calculation";
@@ -174,8 +164,10 @@ int sumColumnsWithZero(int** matrix, int rows, int cols) {
                 totalSum += matrix[i][j];
             }
         }
+        if (zeroPresence) {
+            std::cout << "Sum in column with zero:" << totalSum << std::endl;
+        }
     }
-    return totalSum;
 }
 
 void sortEvenRowAscending(int* row, int cols) {
@@ -232,8 +224,7 @@ void processMatrix() {
         std::cout << "\nOriginal matrix:\n";
         printMatrix(matrix, rows, cols);
 
-        int sum = sumColumnsWithZero(matrix, rows, cols);
-        std::cout << "Sum of elements in columns with zeros: " << sum << std::endl;
+        sumColumnsWithZero(matrix, rows, cols);
 
         sortMatrixRows(matrix, rows, cols);
 
