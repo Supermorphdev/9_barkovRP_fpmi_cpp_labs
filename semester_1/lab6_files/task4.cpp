@@ -3,10 +3,11 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <stdexcept>
 
 const int MAX_OUTPUT_LINES = 10;
 
-int find_max_increasing_substring_length(const std::string& s) {
+int maxSubstringSearch(const std::string& s) {
     if (s.empty()) {
         return 0;
     }
@@ -28,20 +29,20 @@ int find_max_increasing_substring_length(const std::string& s) {
     return max_len;
 }
 
-void process_file_and_print_results(const std::string& filename) {
+int fileRead(const std::string& filename,
+    std::vector<std::string>& lines,
+    std::vector<int>& lengths) {
+
     std::ifstream file(filename);
     if (!file.is_open()) {
-        std::cerr << "🚫 Ошибка: Не удалось открыть файл **" << filename << "**." << std::endl;
-        return;
+        throw std::runtime_error("Error: Could not open file **" + filename + "**.");
     }
 
-    std::vector<std::string> lines;
-    std::vector<int> lengths;
     int overall_max_len = 0;
-
     std::string line;
+
     while (std::getline(file, line)) {
-        int len = find_max_increasing_substring_length(line);
+        int len = maxSubstringSearch(line);
 
         lines.push_back(line);
         lengths.push_back(len);
@@ -49,39 +50,75 @@ void process_file_and_print_results(const std::string& filename) {
         overall_max_len = std::max(overall_max_len, len);
     }
 
-    if (lines.empty() || overall_max_len == 0) {
-        std::cout << "ℹ️ Файл **" << filename << "** пуст или не содержит строк." << std::endl;
+    file.close();
+
+    return overall_max_len;
+}
+
+void matchingLinesPrint(const std::vector<std::string>& lines,const std::vector<int>& lengths,int max_len) {
+
+    if (lines.empty() || max_len <= 0) {
+        std::cout << "Info: No lines found or maximum length is 0." << std::endl;
         return;
     }
 
-    file.close();
-
-    std::cout << "\n--- ✅ РЕЗУЛЬТАТ ---" << std::endl;
-    std::cout << "Максимальная длина строго возрастающей подстроки в файле: **" << overall_max_len << "**" << std::endl;
-    std::cout << "Строки с этой максимальной длиной (первые " << MAX_OUTPUT_LINES << "):" << std::endl;
+    std::cout << "\n--- RESULT ---" << std::endl;
+    std::cout << "Maximum increasing substring length in file: **" << max_len << "**" << std::endl;
+    std::cout << "Lines with this maximum length (first " << MAX_OUTPUT_LINES << "):" << std::endl;
     std::cout << "------------------------------------------" << std::endl;
 
     int count = 0;
+
     for (size_t i = 0; i < lines.size(); ++i) {
         if (count >= MAX_OUTPUT_LINES) {
             break;
         }
 
-        if (lengths[i] == overall_max_len) {
-            std::cout << "[" << count + 1 << "] (Длина: " << overall_max_len << "): " << lines[i] << std::endl;
+        if (lengths[i] == max_len) {
+            std::cout << '[' << count + 1 << "] (Length: " << max_len << "): " << lines[i] << std::endl;
             count++;
         }
     }
 
     if (count >= MAX_OUTPUT_LINES && count < lines.size()) {
-        std::cout << "\n...и, возможно, еще больше строк. Выведено первых " << MAX_OUTPUT_LINES << "." << std::endl;
+        std::cout << "\n...there possible more lines. Displayed the first " << MAX_OUTPUT_LINES << ' ' << std::endl;
     }
     std::cout << "------------------------------------------" << std::endl;
 }
 
 int main() {
     const std::string filename = "input.txt";
-    process_file_and_print_results(filename);
+
+    std::ofstream test_file(filename);
+
+
+    std::vector<std::string> lines_content;
+    std::vector<int> lines_lengths;
+    int max_len = 0;
+
+    try {
+        max_len = fileRead(filename, lines_content, lines_lengths);
+
+        if (lines_content.empty()) {
+            std::cout << "Info: File **" << filename << "** is empty or contains no processable lines." << std::endl;
+            return 0;
+        }
+
+        matchingLinesPrint(lines_content, lines_lengths, max_len);
+
+    }
+    catch (const std::runtime_error& e) {
+        std::cerr << "Caught exception: " << e.what() << std::endl;
+        return 1;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "An unexpected error occurred: " << e.what() << std::endl;
+        return 1;
+    }
+    catch (...) {
+        std::cerr << "An unknown error occurred." << std::endl;
+        return 1;
+    }
 
     return 0;
 }
