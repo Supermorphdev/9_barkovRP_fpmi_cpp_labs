@@ -14,19 +14,19 @@ private:
     void checkIndex(size_t index) const;
 
 public:
-    //КОНСТУКТОРЫ
+    //Constructor default
     Vector();
     explicit Vector(size_t size);
     Vector(std::initializer_list<int> list);
     Vector(const Vector& other);
 
-    ~Vector(); //ДЕСТРУКТОР
+    ~Vector(); //deconstructor
 
-    //ОПЕРАТОРЫ
+    //operators
 
     Vector& operator=(const Vector& other);
 
-    //методы доступа
+    //access methods
 
     int& operator[](size_t index);
     const int& operator[](size_t index) const;
@@ -34,21 +34,21 @@ public:
     int& At(size_t index);
     const int& At(size_t index) const;
 
-    //методы операций
+    //operations methods
     size_t Size() const noexcept;
     size_t Capacity() const noexcept;
     bool Empty() const noexcept;
 
-    //методы модификации
+    //modificatiom methods
     void PushBack(int value);
     void PopBack();
     void Clear() noexcept;
     void Reserve(size_t new_capacity);
 
-    //метод обмена
+    //swap method
     void Swap(Vector& other);
     
-    //оператор вывода
+    //output operator
     friend std::ostream& operator<<(std::ostream& os, const Vector& vec);
 };
 std::ostream& operator<<(std::ostream& os, const Vector& vec);
