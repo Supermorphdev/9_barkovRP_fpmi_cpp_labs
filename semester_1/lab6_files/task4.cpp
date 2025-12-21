@@ -55,7 +55,7 @@ int fileRead(const std::string& filename,
     return overall_max_len;
 }
 
-void matchingLinesPrint(const std::vector<std::string>& lines,const std::vector<int>& lengths,int max_len) {
+void matchingLinesPrint(const std::vector<std::string>& lines, const std::vector<int>& lengths, int max_len) {
 
     if (lines.empty() || max_len <= 0) {
         std::cout << "Info: No lines found or maximum length is 0." << std::endl;
@@ -89,7 +89,7 @@ void matchingLinesPrint(const std::vector<std::string>& lines,const std::vector<
 int main() {
     const std::string filename = "input.txt";
 
-    std::ofstream test_file(filename);
+    std::ifstream test_file(filename);
 
 
     std::vector<std::string> lines_content;
