@@ -48,7 +48,7 @@ public:
     //swap method
     void Swap(Vector& other);
     
-    //output operator
+    //output operator   
     friend std::ostream& operator<<(std::ostream& os, const Vector& vec);
 };
 std::ostream& operator<<(std::ostream& os, const Vector& vec);
